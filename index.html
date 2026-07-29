@@ -49,6 +49,27 @@
   button:hover {
     background-color: #a93226;
   }
+  #history {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+    text-align: left;
+  }
+  #history h2 {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 0.6rem;
+  }
+  #history ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  #history li {
+    padding: 0.3rem 0;
+    font-size: 1rem;
+    font-weight: bold;
+  }
 </style>
 </head>
 <body>
@@ -56,6 +77,10 @@
     <h1>おみくじアプリ</h1>
     <div id="result"></div>
     <button id="draw-btn">おみくじを引く</button>
+    <div id="history">
+      <h2>履歴(直近5回)</h2>
+      <ul id="history-list"></ul>
+    </div>
   </div>
 
   <script>
@@ -68,6 +93,9 @@
     ];
     const resultEl = document.getElementById("result");
     const drawBtn = document.getElementById("draw-btn");
+    const historyListEl = document.getElementById("history-list");
+    const history = [];
+    const MAX_HISTORY = 5;
 
     function drawOmikuji() {
       const totalWeight = results.reduce((sum, r) => sum + r.weight, 0);
@@ -79,10 +107,24 @@
       return results[results.length - 1];
     }
 
+    function renderHistory() {
+      historyListEl.innerHTML = "";
+      history.forEach((r) => {
+        const li = document.createElement("li");
+        li.textContent = r.text;
+        li.style.color = r.color;
+        historyListEl.appendChild(li);
+      });
+    }
+
     drawBtn.addEventListener("click", () => {
       const result = drawOmikuji();
       resultEl.textContent = result.text;
       resultEl.style.color = result.color;
+
+      history.unshift(result);
+      if (history.length > MAX_HISTORY) history.pop();
+      renderHistory();
     });
   </script>
 </body>
