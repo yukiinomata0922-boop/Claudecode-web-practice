@@ -2,77 +2,140 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>高圧ガス法令 一問一答</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap">
 <style>
-  :root { --main:#1d4ed8; --ok:#15803d; --ng:#b91c1c; --bg:#f3f4f6; }
-  * { box-sizing: border-box; }
-  body { font-family:"Hiragino Sans","Noto Sans JP",Arial,sans-serif; background:var(--bg); color:#222; margin:0; line-height:1.7; }
-  header { background:var(--main); color:#fff; padding:.9rem 1rem; }
-  header h1 { margin:0; font-size:1.15rem; }
-  header small { opacity:.85; }
-  main { max-width:640px; margin:0 auto; padding:1rem; }
-  .card { background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08); padding:1.2rem; margin-bottom:1rem; }
-  label { display:block; margin:.5rem 0 .2rem; font-weight:bold; font-size:.9rem; }
-  select { width:100%; padding:.6rem; font-size:1rem; border:1px solid #ccc; border-radius:8px; }
-  .row { display:flex; gap:.6rem; margin-top:.8rem; }
-  button { flex:1; padding:.9rem; font-size:1.05rem; border:0; border-radius:10px; cursor:pointer; background:var(--main); color:#fff; font-weight:bold; }
-  button.sub { background:#e5e7eb; color:#222; }
-  button.maru { background:var(--ok); } button.batsu { background:var(--ng); }
-  button:disabled { opacity:.5; cursor:default; }
-  .meta { display:flex; justify-content:space-between; font-size:.85rem; color:#555; }
-  .q { font-size:1.1rem; margin:.8rem 0; }
-  .result { font-size:1.4rem; font-weight:bold; margin:.4rem 0; }
-  .result.ok { color:var(--ok); } .result.ng { color:var(--ng); }
-  .exp { background:#f9fafb; border-left:4px solid var(--main); padding:.6rem .8rem; border-radius:4px; }
-  .ref { color:#666; font-size:.85rem; margin-top:.3rem; }
-  .bar { height:8px; background:#e5e7eb; border-radius:4px; overflow:hidden; margin:.5rem 0; }
-  .bar > div { height:100%; background:var(--main); width:0; transition:width .2s; }
-  .note { font-size:.78rem; color:#666; }
-  .hidden { display:none; }
+  /* Layout: Instagram-style feed column. Story-ring category picker, post-like question card, story-bar progress. */
+  :root { --bg:#fafafa; --card:#ffffff; --fg:#1c1c1e; --muted:#737373; --line:#dbdbdb; --soft:#f0f0f0;
+    --ig:linear-gradient(45deg,#feda75 0%,#fa7e1e 25%,#d62976 50%,#962fbf 75%,#4f5bd5 100%);
+    --pink:#d62976; --purple:#962fbf; --orange:#fa7e1e; --blue:#4f5bd5; --ok:#16a34a; --ok-bg:#e8f7ee; --ng:#e11d48; --ng-bg:#fdebef;
+    --i:#fa7e1e; --ro:#d62976; --ha:#4f5bd5;
+    --logo:"Grand Hotel","Snell Roundhand",cursive;
+    --font:"Noto Sans JP","Hiragino Sans","Yu Gothic",system-ui,sans-serif; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#000000; --card:#121212; --fg:#f5f5f5; --muted:#a8a8a8; --line:#363636; --soft:#262626; --ok:#4ade80; --ok-bg:#12301f; --ng:#fb7185; --ng-bg:#3a141d; --i:#feb25e; --ro:#ff6aa8; --ha:#8c96ff; color-scheme:dark; } }
+  :root[data-theme="dark"] { --bg:#000000; --card:#121212; --fg:#f5f5f5; --muted:#a8a8a8; --line:#363636; --soft:#262626; --ok:#4ade80; --ok-bg:#12301f; --ng:#fb7185; --ng-bg:#3a141d; --i:#feb25e; --ro:#ff6aa8; --ha:#8c96ff; color-scheme:dark; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:var(--font); font-size:15px; line-height:1.7; background:var(--bg); color:var(--fg);
+    padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); padding-block:0 32px; }
+  .wrap { max-width:470px; margin:0 auto; }
+  header.top { display:flex; align-items:center; justify-content:space-between; padding:14px 0 10px; }
+  .logo { font-family:var(--logo); font-size:2rem; line-height:1.1; background:var(--ig); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .count { font-size:.8rem; color:var(--muted); }
+  [hidden] { display:none !important; }
+
+  /* story rings */
+  .stories { display:flex; gap:14px; overflow-x:auto; padding:6px 2px 14px; scrollbar-width:none; }
+  .stories::-webkit-scrollbar { display:none; }
+  .story { flex:0 0 auto; width:68px; display:flex; flex-direction:column; align-items:center; gap:5px; background:none; border:0; padding:0; color:var(--fg); font:inherit; cursor:pointer; }
+  .ring { width:64px; height:64px; border-radius:50%; padding:3px; background:var(--line); display:grid; place-items:center; }
+  .story[aria-pressed="true"] .ring { background:var(--ig); }
+  .ring > span { width:100%; height:100%; border-radius:50%; background:var(--card); border:3px solid var(--card); display:grid; place-items:center; font-weight:700; font-size:1.25rem; }
+  .story[aria-pressed="true"] .ring > span { color:var(--pink); }
+  .story small { font-size:.68rem; line-height:1.25; text-align:center; color:var(--muted); max-width:68px; }
+
+  .post { background:var(--card); border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-bottom:16px; }
+  .post-head { display:flex; align-items:center; gap:10px; padding:12px 14px; }
+  .avatar { width:36px; height:36px; border-radius:50%; background:var(--ig); display:grid; place-items:center; color:#fff; font-weight:700; flex:0 0 auto; }
+  .who { min-width:0; flex:1; }
+  .who b { display:block; font-size:.9rem; line-height:1.3; }
+  .who span { font-size:.75rem; color:var(--muted); }
+  .post-body { padding:4px 16px 16px; display:flex; flex-direction:column; gap:12px; }
+  .set { display:flex; flex-direction:column; gap:6px; }
+  .set label { font-weight:700; font-size:.82rem; }
+  select { width:100%; padding:10px 12px; font:inherit; color:var(--fg); background:var(--soft); border:1px solid var(--line); border-radius:10px; }
+
+  .btn { width:100%; padding:13px; font:inherit; font-weight:700; border:0; border-radius:10px; cursor:pointer; color:#fff; background:var(--ig); }
+  .btn.ghost { background:var(--soft); color:var(--fg); }
+  .btn:focus-visible, select:focus-visible, .story:focus-visible, .choice:focus-visible { outline:3px solid var(--blue); outline-offset:2px; }
+  .note { font-size:.75rem; color:var(--muted); margin:0; }
+  #stats { margin:0; font-size:.8rem; color:var(--muted); }
+
+  /* story-bar progress */
+  .bars { display:flex; gap:3px; padding:10px 14px 0; }
+  .bars i { flex:1; height:3px; border-radius:2px; background:var(--soft); overflow:hidden; display:block; }
+  .bars i.done { background:var(--ig); } .bars i.now { background:var(--pink); } .bars i.bad { background:var(--ng); }
+
+  .lead { font-weight:700; margin:0; }
+  .stmts { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+  .stmts li { display:flex; gap:10px; padding:10px 12px; background:var(--soft); border-radius:10px; align-items:flex-start; }
+  .kana { flex:0 0 auto; width:28px; height:28px; border-radius:50%; color:#fff; font-weight:700; display:grid; place-items:center; font-size:.85rem; }
+  .k0 { background:var(--orange); } .k1 { background:var(--pink); } .k2 { background:var(--blue); }
+  .stmts p { margin:0; min-width:0; flex:1; }
+  .verdict { display:none; font-size:.78rem; font-weight:700; margin-top:4px; }
+  .answered .verdict { display:block; }
+  .stmts li.t .verdict { color:var(--ok); } .stmts li.f .verdict { color:var(--ng); }
+  .expl { display:none; font-size:.8rem; color:var(--muted); margin-top:2px; }
+  .answered .expl { display:block; }
+  .you { font-size:.72rem; color:var(--muted); }
+
+  .choices { display:flex; flex-direction:column; gap:8px; }
+  .choice { display:flex; align-items:center; gap:10px; width:100%; padding:11px 14px; font:inherit; text-align:left; background:var(--card); color:var(--fg); border:1.5px solid var(--line); border-radius:999px; cursor:pointer; }
+  .choice b { width:24px; height:24px; border-radius:50%; background:var(--soft); display:grid; place-items:center; font-size:.78rem; flex:0 0 auto; }
+  .choice:not(:disabled):hover { border-color:var(--pink); }
+  .choice.right { border-color:var(--ok); background:var(--ok-bg); }
+  .choice.wrongpick { border-color:var(--ng); background:var(--ng-bg); }
+  .choice:disabled { cursor:default; }
+
+  .feedback { display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.05rem; }
+  .feedback svg { width:30px; height:30px; flex:0 0 auto; }
+  .feedback.ok { color:var(--ok); } .feedback.ng { color:var(--ng); }
+  .ref { font-size:.75rem; color:var(--muted); }
+
+  .big { font-size:2.4rem; font-weight:800; margin:0; background:var(--ig); -webkit-background-clip:text; background-clip:text; color:transparent; text-align:center; }
+  .center { text-align:center; margin:0; }
+  @media (prefers-reduced-motion: no-preference) { .bars i { transition:background .2s; } }
 </style>
 </head>
 <body>
-<header><h1>高圧ガス製造保安責任者(機械) 法令 一問一答</h1><small>○×で答える一問一答</small></header>
-<main>
-  <section id="setup" class="card">
-    <label for="cat">分野</label>
-    <select id="cat"></select>
-    <label for="mode">出題モード</label>
-    <select id="mode">
-      <option value="random">ランダム</option>
-      <option value="order">順番どおり</option>
-      <option value="wrong">間違えた問題だけ</option>
-    </select>
-    <div class="row"><button id="start">スタート</button></div>
-    <p id="stats" class="note"></p>
-    <div class="row"><button id="reset" class="sub">成績をリセット</button></div>
+<div class="wrap">
+  <header class="top"><span class="logo">Koatsu Quiz</span><span class="count">高圧ガス法令 一問一答</span></header>
+
+  <section id="setup">
+    <div class="stories" id="stories" role="group" aria-label="分野を選ぶ"></div>
+    <div class="post">
+      <div class="post-head"><div class="avatar" id="set-avatar">全</div><div class="who"><b id="set-name">すべて</b><span>高圧ガス製造保安責任者(機械)・法令</span></div></div>
+      <div class="post-body">
+        <div class="set"><label for="num">出題数</label>
+          <select id="num"><option value="5">5問</option><option value="10" selected>10問</option><option value="20">20問</option></select></div>
+        <div class="set"><label for="mode">出題モード</label>
+          <select id="mode"><option value="random">ランダム</option><option value="wrong">間違えた記述を含む問題</option></select></div>
+        <button class="btn" id="start">スタート</button>
+        <p id="stats"></p>
+        <button class="btn ghost" id="reset">成績をリセット</button>
+      </div>
+    </div>
   </section>
 
-  <section id="quiz" class="card hidden">
-    <div class="meta"><span id="cat-label"></span><span id="progress"></span></div>
-    <div class="bar"><div id="bar"></div></div>
-    <p class="q" id="question"></p>
-    <div class="row" id="answer-btns">
-      <button class="maru" data-a="1">○ 正しい</button>
-      <button class="batsu" data-a="0">× 誤り</button>
+  <section id="quiz" hidden>
+    <div class="post" id="post">
+      <div class="bars" id="bars"></div>
+      <div class="post-head"><div class="avatar" id="q-avatar"></div><div class="who"><b id="q-cat"></b><span id="q-no"></span></div></div>
+      <div class="post-body">
+        <p class="lead">次のイ、ロ、ハの記述のうち、正しいものはどれか。</p>
+        <ul class="stmts" id="stmts"></ul>
+        <div class="choices" id="choices"></div>
+        <div id="after" hidden>
+          <div class="feedback" id="fb"></div>
+        </div>
+        <button class="btn" id="next" hidden>次の問題へ</button>
+        <button class="btn ghost" id="quit">やめる</button>
+      </div>
     </div>
-    <div id="feedback" class="hidden">
-      <div id="result" class="result"></div>
-      <div class="exp"><span id="exp"></span><div class="ref" id="ref"></div></div>
-      <div class="row"><button id="next">次の問題へ</button></div>
-    </div>
-    <div class="row"><button id="quit" class="sub">やめる</button></div>
   </section>
 
-  <section id="summary" class="card hidden">
-    <h2 style="margin-top:0">結果</h2>
-    <p id="score" style="font-size:1.3rem"></p>
-    <div class="row"><button id="again">もう一度</button></div>
+  <section id="summary" hidden>
+    <div class="post"><div class="post-body" style="padding-top:20px">
+      <p class="center" id="sum-label">結果</p>
+      <p class="big" id="score"></p>
+      <p class="center" id="score-sub"></p>
+      <button class="btn" id="again">トップへ戻る</button>
+    </div></div>
   </section>
 
   <p class="note">※問題は公開法令(高圧ガス保安法・一般高圧ガス保安規則・容器保安規則)をもとに作成した練習用です。数値・条文は最新の法令で必ず確認してください。</p>
-</main>
+</div>
 <script src="questions.js"></script>
 <script src="app.js"></script>
 </body>
