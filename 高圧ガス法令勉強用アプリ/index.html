@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高圧ガス法令 一問一答</title>
+<style>
+  :root { --main:#1d4ed8; --ok:#15803d; --ng:#b91c1c; --bg:#f3f4f6; }
+  * { box-sizing: border-box; }
+  body { font-family:"Hiragino Sans","Noto Sans JP",Arial,sans-serif; background:var(--bg); color:#222; margin:0; line-height:1.7; }
+  header { background:var(--main); color:#fff; padding:.9rem 1rem; }
+  header h1 { margin:0; font-size:1.15rem; }
+  header small { opacity:.85; }
+  main { max-width:640px; margin:0 auto; padding:1rem; }
+  .card { background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.08); padding:1.2rem; margin-bottom:1rem; }
+  label { display:block; margin:.5rem 0 .2rem; font-weight:bold; font-size:.9rem; }
+  select { width:100%; padding:.6rem; font-size:1rem; border:1px solid #ccc; border-radius:8px; }
+  .row { display:flex; gap:.6rem; margin-top:.8rem; }
+  button { flex:1; padding:.9rem; font-size:1.05rem; border:0; border-radius:10px; cursor:pointer; background:var(--main); color:#fff; font-weight:bold; }
+  button.sub { background:#e5e7eb; color:#222; }
+  button.maru { background:var(--ok); } button.batsu { background:var(--ng); }
+  button:disabled { opacity:.5; cursor:default; }
+  .meta { display:flex; justify-content:space-between; font-size:.85rem; color:#555; }
+  .q { font-size:1.1rem; margin:.8rem 0; }
+  .result { font-size:1.4rem; font-weight:bold; margin:.4rem 0; }
+  .result.ok { color:var(--ok); } .result.ng { color:var(--ng); }
+  .exp { background:#f9fafb; border-left:4px solid var(--main); padding:.6rem .8rem; border-radius:4px; }
+  .ref { color:#666; font-size:.85rem; margin-top:.3rem; }
+  .bar { height:8px; background:#e5e7eb; border-radius:4px; overflow:hidden; margin:.5rem 0; }
+  .bar > div { height:100%; background:var(--main); width:0; transition:width .2s; }
+  .note { font-size:.78rem; color:#666; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+<header><h1>高圧ガス製造保安責任者(機械) 法令 一問一答</h1><small>○×で答える一問一答</small></header>
+<main>
+  <section id="setup" class="card">
+    <label for="cat">分野</label>
+    <select id="cat"></select>
+    <label for="mode">出題モード</label>
+    <select id="mode">
+      <option value="random">ランダム</option>
+      <option value="order">順番どおり</option>
+      <option value="wrong">間違えた問題だけ</option>
+    </select>
+    <div class="row"><button id="start">スタート</button></div>
+    <p id="stats" class="note"></p>
+    <div class="row"><button id="reset" class="sub">成績をリセット</button></div>
+  </section>
+
+  <section id="quiz" class="card hidden">
+    <div class="meta"><span id="cat-label"></span><span id="progress"></span></div>
+    <div class="bar"><div id="bar"></div></div>
+    <p class="q" id="question"></p>
+    <div class="row" id="answer-btns">
+      <button class="maru" data-a="1">○ 正しい</button>
+      <button class="batsu" data-a="0">× 誤り</button>
+    </div>
+    <div id="feedback" class="hidden">
+      <div id="result" class="result"></div>
+      <div class="exp"><span id="exp"></span><div class="ref" id="ref"></div></div>
+      <div class="row"><button id="next">次の問題へ</button></div>
+    </div>
+    <div class="row"><button id="quit" class="sub">やめる</button></div>
+  </section>
+
+  <section id="summary" class="card hidden">
+    <h2 style="margin-top:0">結果</h2>
+    <p id="score" style="font-size:1.3rem"></p>
+    <div class="row"><button id="again">もう一度</button></div>
+  </section>
+
+  <p class="note">※問題は公開法令(高圧ガス保安法・一般高圧ガス保安規則・容器保安規則)をもとに作成した練習用です。数値・条文は最新の法令で必ず確認してください。</p>
+</main>
+<script src="questions.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
